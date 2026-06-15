@@ -1,27 +1,44 @@
 def evaluate_refund(transactions):
 
+    reasoning = []
+
     if len(transactions) < 2:
-        return False
+        return {
+            "eligible": False,
+            "reasoning": ["Less than two transactions found"]
+        }
 
-    first = transactions[0]
-    second = transactions[1]
+    txn1 = transactions[0]
+    txn2 = transactions[1]
 
-    same_amount = (
-        first["amount"] == second["amount"]
-    )
+    if txn1["merchant"] == txn2["merchant"]:
+        reasoning.append("Same merchant")
+    else:
+        return {
+            "eligible": False,
+            "reasoning": ["Different merchants"]
+        }
 
-    same_merchant = (
-        first["merchant"] == second["merchant"]
-    )
+    if txn1["amount"] == txn2["amount"]:
+        reasoning.append("Same amount")
+    else:
+        return {
+            "eligible": False,
+            "reasoning": ["Different amounts"]
+        }
 
-    both_success = (
-        first["status"] == "SUCCESS"
-        and
-        second["status"] == "SUCCESS"
-    )
+    if (
+        txn1["status"] == "SUCCESS"
+        and txn2["status"] == "SUCCESS"
+    ):
+        reasoning.append("Both transactions successful")
+    else:
+        return {
+            "eligible": False,
+            "reasoning": ["One or more transactions failed"]
+        }
 
-    return (
-        same_amount
-        and same_merchant
-        and both_success
-    )
+    return {
+        "eligible": True,
+        "reasoning": reasoning
+    }
