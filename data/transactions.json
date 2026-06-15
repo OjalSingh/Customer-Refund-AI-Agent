@@ -1,0 +1,23 @@
+[
+  {
+    "txn_id": "TXN101",
+    "user_id": "U001",
+    "merchant": "Netflix",
+    "amount": 500,
+    "status": "SUCCESS"
+  },
+  {
+    "txn_id": "TXN102",
+    "user_id": "U001",
+    "merchant": "Netflix",
+    "amount": 500,
+    "status": "SUCCESS"
+  },
+  {
+    "txn_id": "TXN201",
+    "user_id": "U002",
+    "merchant": "Amazon",
+    "amount": 1000,
+    "status": "SUCCESS"
+  }
+]

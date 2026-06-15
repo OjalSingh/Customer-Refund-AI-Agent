@@ -3,5 +3,10 @@
     "user_id": "U001",
     "name": "Alex",
     "status": "ACTIVE"
+  },
+  {
+    "user_id": "U002",
+    "name": "Sarah",
+    "status": "ACTIVE"
   }
 ]
