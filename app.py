@@ -1,5 +1,27 @@
-from agent.intent_extractor import extract_intent
+from agent.support_agent import run_agent
 
-message = "I was charged twice by Netflix and need a refund"
 
-print(extract_intent(message))
+def main():
+
+    print("\nREFUND SUPPORT AGENT\n")
+
+    user_message = input("Customer Message: ")
+    user_id = input("User ID: ")
+
+    result = run_agent(user_message, user_id)
+
+    print("\nFINAL DECISION:", result["decision"])
+
+    print("\n--- AUDIT TRAIL ---")
+    for i, log in enumerate(result["audit_log"], 1):
+        print(f"{i}. {log}")
+
+    print("\n--- INTENT ---")
+    print(result["intent"])
+
+    print("\n--- RISK ---")
+    print(result["risk_result"]["risk_level"])
+
+
+if __name__ == "__main__":
+    main()
