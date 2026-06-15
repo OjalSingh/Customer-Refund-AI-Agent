@@ -1,0 +1,34 @@
+DUPLICATE CHARGE REFUND POLICY
+
+Purpose:
+To determine whether a customer is eligible for refund review due to duplicate charges.
+
+Eligibility Requirements:
+
+1. At least two successful transactions must exist.
+
+2. Transactions must belong to the same merchant.
+
+3. Transactions must be for the same amount.
+
+4. Refund requests must be submitted within 30 days of the transaction.
+
+5. The AI agent cannot directly approve or process refunds.
+
+6. Eligible cases must be escalated to a human reviewer.
+
+Rejection Conditions:
+
+1. User account cannot be verified.
+
+2. Transactions belong to different merchants.
+
+3. Transaction amounts differ.
+
+4. One or more transactions failed.
+
+5. Insufficient transaction evidence.
+
+Escalation Policy:
+
+All eligible refund requests require human review before funds are returned.
