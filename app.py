@@ -1,12 +1,7 @@
-from tools.user_tool import search_user
-from tools.transaction_tool import get_transactions
-from policies.refund_policy import evaluate_refund
+from agent.support_agent import investigate_refund
 
+result = investigate_refund("U001")
 
-user = search_user("U001")
-
-transactions = get_transactions("U001")
-
-result = evaluate_refund(transactions)
-
+print()
+print("FINAL DECISION")
 print(result)
