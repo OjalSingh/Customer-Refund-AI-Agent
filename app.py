@@ -1,7 +1,8 @@
 from agent.support_agent import investigate_refund
 
-result = investigate_refund("U001")
+user_id = input("Enter User ID: ")
 
-print()
-print("FINAL DECISION")
+result = investigate_refund(user_id)
+
+print("\nFINAL DECISION")
 print(result)
