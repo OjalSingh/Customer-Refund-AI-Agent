@@ -5,8 +5,15 @@ def run_intent_node(state):
 
     result = extract_intent(state.state["user_message"])
 
-    state.update("intent", result["intent"])
-    state.update("merchant", result["merchant"])
+    state.update(
+        "intent",
+        result.get("intent")
+    )
+
+    state.update(
+        "merchant",
+        result.get("merchant")
+    )
 
     state.log("Intent extracted using Qwen")
 

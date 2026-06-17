@@ -1,0 +1,7 @@
+Duplicate successful transactions may be refunded.
+
+Both transactions must be successful.
+
+Transactions must have identical amounts.
+
+Transactions must originate from the same merchant.

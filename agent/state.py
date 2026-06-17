@@ -2,30 +2,41 @@ class AgentState:
 
     def __init__(self, user_message):
 
-        self.state = {
-            "user_message": user_message,
-            "intent": None,
-            "merchant": None,
+            self.state = {
+                "user_message": user_message,
+                "intent": None,
 
-            "user_id": None,
-            "user": None,
+                "retrieved_docs": [],
+                "document_contents": {},
+                "explanation": None,
 
-            "transactions": [],
-            "policy": None,
+                "merchant": None,
 
-            "policy_result": None,
-            "risk_result": None,
+                "user_id": None,
+                "user": None,
 
-            "decision": None,
+                "transactions": [],
+                "policy": None,
 
-            "audit_log": []
-        }
+                "policy_result": None,
+                "risk_result": None,
+
+                "decision": None,
+
+                "missing_fields": [],
+                "conversation_history": [],
+
+                "audit_log": [],
+            }
 
     def update(self, key, value):
         self.state[key] = value
 
     def log(self, message):
         self.state["audit_log"].append(message)
+
+    def value(self, key, default=None):
+        return self.state.get(key, default)
 
     def get(self):
         return self.state

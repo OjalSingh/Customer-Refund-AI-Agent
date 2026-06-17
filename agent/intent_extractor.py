@@ -21,4 +21,11 @@ Message:
 
     response = ask_llm(prompt)
 
-    return json.loads(response)
+    try:
+        return json.loads(response)
+
+    except Exception:
+        return {
+            "intent": "unknown",
+            "merchant": None
+        }

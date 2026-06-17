@@ -1,0 +1,3 @@
+Accounts showing suspicious activity require manual review.
+
+High-risk accounts cannot receive automatic refunds.

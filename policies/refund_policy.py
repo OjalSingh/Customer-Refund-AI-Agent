@@ -8,8 +8,26 @@ def evaluate_refund(transactions):
             "reasoning": ["Less than two transactions found"]
         }
 
-    txn1 = transactions[0]
-    txn2 = transactions[1]
+    for i in range(len(transactions)):
+        for j in range(i + 1, len(transactions)):
+
+            txn1 = transactions[i]
+            txn2 = transactions[j]
+
+        if (
+            txn1["merchant"] == txn2["merchant"]
+            and txn1["amount"] == txn2["amount"]
+            and txn1["status"] == "SUCCESS"
+            and txn2["status"] == "SUCCESS"
+        ):
+            return {
+                "eligible": True,
+                "reasoning": [
+                    "Duplicate transaction detected",
+                    f"Merchant: {txn1['merchant']}",
+                    f"Amount: {txn1['amount']}"
+                ]
+            }
 
     if txn1["merchant"] == txn2["merchant"]:
         reasoning.append("Same merchant")
