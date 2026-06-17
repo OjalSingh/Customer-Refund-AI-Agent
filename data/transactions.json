@@ -19,5 +19,17 @@
     "merchant": "Amazon",
     "amount": 1000,
     "status": "SUCCESS"
+  },
+  {
+    "user_id": "U005",
+    "merchant": "Netflix",
+    "amount": 500,
+    "status": "SUCCESS"
+  },
+  {
+    "user_id": "U005",
+    "merchant": "Netflix",
+    "amount": 700,
+    "status": "SUCCESS"
   }
 ]

@@ -6,8 +6,11 @@ class AgentState:
                 "user_message": user_message,
                 "intent": None,
 
+                "customer_context": {},
+
                 "retrieved_docs": [],
                 "document_contents": {},
+                "investigation_result": None,
                 "explanation": None,
 
                 "merchant": None,
@@ -40,3 +43,9 @@ class AgentState:
 
     def get(self):
         return self.state
+    
+    def update_customer_context(self, key, value):
+        if "customer_context" not in self.state:
+            self.state["customer_context"] = {}
+
+        self.state["customer_context"][key] = value

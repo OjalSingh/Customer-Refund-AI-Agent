@@ -1,11 +1,11 @@
-def get_missing_fields(state):
+def get_questions(intent):
 
-    missing = []
+    intent = intent.lower()
 
-    if not state["merchant"]:
-        missing.append("merchant")
+    if intent == "refund":
+        return [
+            "What is the reason for your refund request?",
+            "Which merchant was involved?"
+        ]
 
-    if not state["user_id"]:
-        missing.append("user_id")
-
-    return missing
+    return []

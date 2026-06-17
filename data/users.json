@@ -8,5 +8,20 @@
     "user_id": "U002",
     "name": "Sarah",
     "status": "ACTIVE"
+  },
+  {
+    "user_id": "U003",
+    "name": "Tabitha",
+    "status": "ACTIVE"
+  },
+  {
+    "user_id": "U004",
+    "name": "Julie",
+    "status": "ACTIVE"
+  },
+  {
+    "user_id": "U005",
+    "name": "Ben",
+    "status": "ACTIVE"
   }
 ]

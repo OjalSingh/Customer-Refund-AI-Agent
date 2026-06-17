@@ -30,5 +30,9 @@ def assess_risk(user, transactions):
     return {
         "risk_score": score,
         "risk_level": level,
-        "reasons": reasons
+        "reasons": reasons,
+        "signals": {
+            "high_value_user": total_amount > 10000,
+            "frequent_user": len(transactions) > 5
+        }
     }
