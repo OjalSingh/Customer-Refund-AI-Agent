@@ -84,33 +84,69 @@ Audit Trail:
 
 
 # 📂 Project Structure
+```text
 Bash
-├── app.py                         # Runtime entry-point & UI loop
-├── data/
-│   ├── transactions.json          # Real-world mock customer ledgers
-│   └── users.json                 # Premium, standard, and flagged profiles
-├── agent/
-│   ├── support_agent.py           # Core Orchestrator & routing state machine
-│   ├── intent_extractor.py        # Semantic classification engine
-│   ├── question_manager.py        # Dynamic text-policy information auditor
-│   ├── explanation_generator.py   # State metadata aggregation
-│   └── explanation_llm.py         # Customer-facing conversational synthesis
-└── tools/
-    └── policy_retriever.py        # Dynamic local policy lookups
-🔧 Installation & Local Setup
+├───app.py                      # Main interface & interactive application loop
+├───llm.py                      # Local LLM connector framework (Ollama abstraction)
+├───README.md                   # System documentation
+├───requirements.txt            # Project dependencies
+│   
+├───agent                       # Agentic Core Orchestration Layer
+│   ├── executor.py             # Event loop & state execution engine
+│   ├── explanation_generator.py # Structured metadata extraction & alignment
+│   ├── explanation_llm.py      # Conversational customer text synthesis
+│   ├── intent_extractor.py     # Semantic input classification
+│   ├── intent_node.py          # Node routing registry for state trees
+│   ├── policy_engine.py        # Programmatic compliance checking logic
+│   ├── question_manager.py     # Dynamic missing-variable triage auditor
+│   ├── report_generator.py     # Analytical terminal summary compiling
+│   ├── router.py               # Algorithmic intent-to-workflow router
+│   ├── state.py                # Thread-safe unified transaction state tracking
+│   ├── support_agent.py        # Pipeline execution & workflow manager
+│   ├── tool_registry.py        # Tool-to-agent binding gateway
+│   └──_init_.py
+│       
+├───data                        # Mock Enterprise Datastores
+│   ├── transactions.json       # Live client transaction history records
+│   └── users.json              # Structured account access profiles
+│       
+├───guardrails                  # Security & Compliance Boundaries
+│   └──validation.py           # Explicit logic filters blocking structural leakage
+│       
+├───policies                    # Core Corporate Guideline Datastores
+│   ├──fraud_policy.txt        # Text requirements for velocity checks
+│   ├──refund_policy.py        # Programmatic execution mirrors for refunds
+│   ├──refund_policy.txt       # Hard criteria documentation for billing errors
+│   └──subscription_policy.txt # Scope rules for recurring account cancellations
+│       
+├───risk                        # Safety & Assessment Services
+│   └──risk_engine.py          # Multi-factor score calculator & fraud engine
+│       
+└───tools                       # High-Fidelity Data Extraction & Utility APIs
+    ├──document_loader.py      # Local file data normalization
+    ├──document_retriever.py   # Semantic document retrieval engine
+    ├──duplicate_detector.py   # Chronological transaction stream evaluation
+    ├──investigation_engine.py # Core transaction audit processing system
+    ├──policy_retriever.py     # Live text-policy context manager
+    ├──transaction_tool.py     # Target transaction fetching wrapper
+    ├──user_tool.py            # User profile data parser
+    └──__init_.py
 
 
-# Clone the Repository
+```
 
-## Bash
+# 🔧 Installation & Local Setup
+## Clone the Repository
+
+### Bash
 git clone [https://github.com/your-username/deterministic-finops-agent.git](https://github.com/your-username/deterministic-finops-agent.git)
 cd deterministic-finops-agent
 Start your Local Inference Engine
 Ensure Ollama is running on your machine, then pull the target lightweight model:
 
-## Bash
+### Bash
 ollama pull qwen2.5:3b
 Run the Application
 
-## Bash
+### Bash
 python app.py
