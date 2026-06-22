@@ -1,3 +1,5 @@
-Accounts showing suspicious activity require manual review.
+[VELOCITY-ATTACK-FLAG]
+Accounts exhibiting transactional actions targeting the exact same merchant gateway within an instantaneous time delta window of less than 60 seconds must be systematically routed away from basic operational flows. Near-simultaneous multi-billing raises a severe risk of automated transaction-testing scripts or API hijacking.
 
-High-risk accounts cannot receive automatic refunds.
+[HIGH-VALUE-COMPLIANCE-LIMIT]
+Any dispute, financial refund request, or fraud report linked to an individual ledger item totaling a transaction sum equal to or exceeding $500.00 is classified as an Enterprise Risk. This action triggers an absolute override of the agent state machine, mandating a safe ESCALATE decision to human risk analysts.

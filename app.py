@@ -1,44 +1,64 @@
+import streamlit as st
 from agent.support_agent import run_agent
-from agent.report_generator import generate_report
-from agent.intent_extractor import extract_intent
-from agent.question_manager import get_dynamic_questions
-from tools.policy_retriever import retrieve_policy
 
-def main():
-    print("\n⚡ REASONING REFUND AGENT INTERFACE ⚡\n")
-    user_message = input("Customer Message: ")
+# 1. Page Configuration & Aesthetic Layout
+st.set_page_config(page_title="FinOps Agent Framework", page_icon="🛡️", layout="wide")
 
-    # 1. Classify intent dynamically
-    intent_data = extract_intent(user_message)
-    intent = intent_data.get("intent", "unknown")
-    print("DEBUG INTENT:", intent)
+st.title("🛡️ Autonomous FinOps & Risk Agent Engine")
+st.markdown("A local, guardrailed state-machine agent executing semantic policy compliance via local vector embeddings (`all-minilm`).")
+st.markdown("---")
 
-    # 2. Grab raw policy guidelines to see what data fields we need
-    # (Reads policies/refund_policy.txt, etc.)
-    policy_text = retrieve_policy() 
+# 2. Side Panel Configuration (Displays current State Machine Variables)
+with st.sidebar:
+    st.header("⚙️ Engine Parameters")
+    user_id = st.text_input("Simulated User ID", value="U001")
+    st.markdown("---")
+    st.subheader("📚 Loaded RAG Repositories")
+    st.caption("• policies/refund_policy.txt")
+    st.caption("• policies/fraud_policy.txt")
+    st.caption("• policies/subscription_policy.txt")
 
-    # 3. Ask the LLM to dynamically audit the missing details
-    questions = get_dynamic_questions(intent, user_message, policy_text)
-    answers = {}
+# Initialize Chat Memory State
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-    # 4. Collect answers naturally without menus
-    if questions:
-        print("\n--- Clarification Needed ---")
-        for question in questions:
-            answers[question] = input(f"Agent: {question}\nCustomer: ")
-        print("----------------------------\n")
+# Display Conversational History
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-    user_id = input("Agent: Please provide your User ID to pull transaction context: ")
+# 3. Dynamic User Interaction Flow
+if user_input := st.chat_input("Enter transaction query (e.g., 'I got charged twice by Netflix')"):
+    
+    # Render user prompt immediately
+    with st.chat_message("user"):
+        st.markdown(user_input)
+    st.session_state.messages.append({"role": "user", "content": user_input})
 
-    # 5. Hand the entire bundle over to the core state engine
-    result = run_agent(
-        user_message=user_message,
-        user_id=user_id,
-        follow_up_answers=answers
-    )
+    # Trigger Backend Orchestrator Stream
+    with st.spinner("Executing agentic state-machine iteration loops..."):
+        # Run your actual backend code!
+        agent_final_state = run_agent(user_message=user_input, user_id=user_id)
+        
+        # Pull generated components out of your AgentState dictionary
+        llm_response = agent_final_state.get("explanation", "No response generated.")
+        decision = agent_final_state.get("decision", "REJECT")
+        retrieved_policy = agent_final_state.get("policy", "No policy matches found.")
 
-    report = generate_report(result)
-    print(report)
+    # Render Agent Response
+    with st.chat_message("assistant"):
+        # Visual badge highlighting the isolated state machine decision output
+        if decision == "ESCALATE":
+            st.error(f"🚨 SYSTEM STATE: [ESCALATE TO RISK OPERATIONS]")
+        elif decision == "REJECT":
+            st.warning(f"⚠️ SYSTEM STATE: [REJECT TRANSACTION]")
+        else:
+            st.success(f"✅ SYSTEM STATE: [{decision}]")
+            
+        st.markdown(llm_response)
+        
+        # Collapsible section proving your RAG system worked beautifully
+        with st.expander("🔍 System Audit Trail (Semantic RAG Chunks Used)"):
+            st.code(retrieved_policy, language="text")
 
-if __name__ == "__main__":
-    main()
+    st.session_state.messages.append({"role": "assistant", "content": llm_response})

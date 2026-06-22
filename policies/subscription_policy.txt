@@ -1,1 +1,2 @@
-Subscription renewals are not eligible for refunds unless charged multiple times.
+[SUBSCRIPTION-CANCELLATION-RULE]
+Users are authorized to terminate recurring billing agreements at any time via the automated interface, provided there are no outstanding past-due invoices attached to the subscription ID. If an invoice is collection-pending, the system must freeze the automatic pipeline.

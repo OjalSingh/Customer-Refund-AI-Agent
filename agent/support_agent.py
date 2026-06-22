@@ -1,14 +1,13 @@
 from agent.state import AgentState
 from tools.user_tool import search_user
 from tools.transaction_tool import get_transactions
-from tools.policy_retriever import retrieve_policy
+from tools.policy_retriever import retrieve_policy_semantically
 from agent.intent_node import run_intent_node
 from agent.router import route_intent
 from tools.investigation_engine import run_investigation
 from policies.refund_policy import evaluate_refund_with_policy
 from risk.risk_engine import assess_risk
 from guardrails.validation import validate_decision
-from tools.document_retriever import retrieve_relevant_docs
 from tools.document_loader import load_document_contents
 from agent.explanation_generator import build_explanation
 from agent.explanation_llm import generate_explanation
@@ -66,7 +65,7 @@ def run_agent(user_message, user_id, follow_up_answers=None):
     state.update_customer_context("risk_score", risk_result["risk_score"])
 
     # 6. Retrieve Static Text Policy Rules
-    policy = retrieve_policy()
+    policy = retrieve_policy_semantically(user_message=state.value("customer_message"), workflow=state.value("intent"))
     state.update("policy", policy)
 
     # ==========================================================

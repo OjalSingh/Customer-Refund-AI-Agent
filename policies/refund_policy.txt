@@ -1,7 +1,5 @@
-Duplicate successful transactions may be refunded.
+[REFUND-ELIGIBILITY-CRITERIA]
+Standard cash refunds are strictly permitted only if a transaction is mathematically flaggable as a duplicate billing error. The system demands that at least two matching transaction records must exist with identical transaction totals and identical merchant registration names. Single unique ledger items do not qualify.
 
-Both transactions must be successful.
-
-Transactions must have identical amounts.
-
-Transactions must originate from the same merchant.
+[SHIPPED-GOODS-REJECTION-RULE]
+Physical inventory items that have already achieved a carrier tracking status of 'SHIPPED' or 'DELIVERED' are permanently locked out of the automated customer operations pipeline. Customers requesting cancellations on shipped physical items must be redirected to log a standard physical warehouse return merchandise authorization (RMA) request.
