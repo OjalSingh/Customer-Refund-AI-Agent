@@ -83,6 +83,56 @@ Audit Trail:
 ```
 
 
+# 🏛️ System Architecture & Data Flow Diagram
+The following diagram illustrates how a user message dynamically orchestrates context aggregation, triggers local semantic array vector scoring, and passes bounded guardrail metrics to the execution layer.
+```text
+[ User Prompt Input via Streamlit UI ]
+                                    │
+                                    ▼
+                      ┌──────────────────────────┐
+                      │ 1. Intent Routing Node   │ ──> Categorizes (Refund / Fraud / Sub)
+                      └─────────────┬────────────┘
+                                    │
+                                    ▼
+                      ┌──────────────────────────┐
+                      │ 2. Data Enrichment Hooks │ ──> Pulls Local User Ledger & History
+                      └─────────────┬────────────┘
+                                    │
+                                    ▼
+       ┌──────────────────────────────────────────────────────────┐
+       │ 3. Semantic Vector Search Layer (Local RAG)              │
+       │                                                          │
+       │    User Message                                          │
+       │         │                                                │
+       │         ▼                                                │
+       │   [all-minilm] ──> Math Cosine Match ──> Memory Cache    │
+       │                             │              ▲             │
+       │                             ▼              │             │
+       │                     [Top 2 Policy Chunks] ─┘             │
+       └─────────────────────────────┬────────────────────────────┘
+                                    │
+                                    ▼
+                      ┌──────────────────────────┐
+                      │ 4. Prompt Synthesis      │ ──> Combines Context + Isolated Rules
+                      └─────────────┬────────────┘
+                                    │
+                                    ▼
+                      ┌──────────────────────────┐
+                      │ 5. LLM Evaluation Engine │ ──> Enforces JSON Policy Ruleset Matrix
+                      └─────────────┬────────────┘
+                                    │
+                                    ▼
+                      ┌──────────────────────────┐
+                      │ 6. Core State Guardrails │ ──> Hard Block / Escalate Determinations
+                      └─────────────┬────────────┘
+                                    │
+                                    ▼
+               [ Outbound State: ESCALATE / REJECT / APPROVE ]
+               [ UI Render: Collapsible System Audit Trail   ]
+
+```
+
+
 # 📂 Project Structure
 ```text
 Bash
@@ -139,14 +189,28 @@ Bash
 ## Clone the Repository
 
 ### Bash
-git clone [https://github.com/your-username/deterministic-finops-agent.git](https://github.com/your-username/deterministic-finops-agent.git)
-cd deterministic-finops-agent
+git clone [https://github.com/your-username/deterministic-finops-agent.git]([https://github.com/OjalSingh/Customer-Refund-AI-Agent])
+cd Customer-Refund-AI-Agent
 Start your Local Inference Engine
-Ensure Ollama is running on your machine, then pull the target lightweight model:
+
+## Environment Setup & Dependency Installation
+Isolate your workspace and install the lightweight system requirements:
+### Create a virtual environment
+python -m venv venv
+### Activate the environment (Windows PowerShell)
+.\venv\Scripts\Activate.ps1
+### Activate the environment (Mac/Linux)
+source venv/bin/activate
+### Install exact pinned dependencies
+pip install -r requirements.txt
+
+## Configure Local Embeddings & Models via Ollama
+The semantic retrieval layers run locally to ensure 0% external cloud data leakage. Ensure Ollama is running on your machine, then pull the lightweight embedding model
+### Bash
+ollama pull qwen3b:8
+ollama pull all-minilm
+
+## Launching the Interactive Web UI Interface
 
 ### Bash
-ollama pull qwen2.5:3b
-Run the Application
-
-### Bash
-python app.py
+python -m streamlit run app.py
