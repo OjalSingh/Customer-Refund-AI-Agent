@@ -1,27 +1,37 @@
 [
   {
     "user_id": "U001",
-    "name": "Alex",
-    "status": "ACTIVE"
+    "name": "Alex Mercer",
+    "status": "ACTIVE",
+    "tier": "STANDARD",
+    "email": "alex.m@example.com"
   },
   {
     "user_id": "U002",
-    "name": "Sarah",
-    "status": "ACTIVE"
+    "name": "Sarah Jenkins",
+    "status": "ACTIVE",
+    "tier": "PREMIUM",
+    "email": "s.jenkins@example.com"
   },
   {
     "user_id": "U003",
-    "name": "Tabitha",
-    "status": "ACTIVE"
+    "name": "Tabitha Cruz",
+    "status": "UNDER_REVIEW",
+    "tier": "STANDARD",
+    "email": "tcruz99@example.com"
   },
   {
     "user_id": "U004",
-    "name": "Julie",
-    "status": "ACTIVE"
+    "name": "Julie Vance",
+    "status": "ACTIVE",
+    "tier": "STANDARD",
+    "email": "julie.v@example.com"
   },
   {
     "user_id": "U005",
-    "name": "Ben",
-    "status": "ACTIVE"
+    "name": "Ben Woodward",
+    "status": "ACTIVE",
+    "tier": "PREMIUM",
+    "email": "benwood@example.com"
   }
 ]

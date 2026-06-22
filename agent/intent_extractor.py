@@ -1,29 +1,24 @@
 import json
 from llm import ask_llm
 
-
 def extract_intent(message):
-
-    prompt = f"""
-You are an information extraction system.
-
-Return ONLY valid JSON.
+    prompt = f"""[System: JSON Extraction Engine. Return ONLY valid JSON matching the schema. No conversational prose.]
 
 Schema:
-{{
-    "intent": "",
-    "merchant": ""
-}}
+{{"intent": "refund" / "fraud" / "subscription" / "order_cancellation" / "unknown", "merchant": "name or null"}}
 
-Message:
-{message}
-"""
+Input Message:
+"{message}"
 
-    response = ask_llm(prompt)
+JSON:"""
+
+    response = ask_llm(prompt).strip()
 
     try:
+        # Simple cleanup helper to strip accidental markdown wrappers like ```json
+        if "```" in response:
+            response = response.split("```")[1].replace("json", "").strip()
         return json.loads(response)
-
     except Exception:
         return {
             "intent": "unknown",

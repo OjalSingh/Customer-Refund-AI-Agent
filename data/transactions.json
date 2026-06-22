@@ -3,33 +3,82 @@
     "txn_id": "TXN101",
     "user_id": "U001",
     "merchant": "Netflix",
-    "amount": 500,
-    "status": "SUCCESS"
+    "amount": 15.49,
+    "status": "SUCCESS",
+    "timestamp": "2026-06-20T08:30:00Z"
   },
   {
     "txn_id": "TXN102",
     "user_id": "U001",
     "merchant": "Netflix",
-    "amount": 500,
-    "status": "SUCCESS"
+    "amount": 15.49,
+    "status": "SUCCESS",
+    "timestamp": "2026-06-20T08:30:15Z"
   },
   {
     "txn_id": "TXN201",
     "user_id": "U002",
     "merchant": "Amazon",
-    "amount": 1000,
-    "status": "SUCCESS"
+    "amount": 1249.99,
+    "status": "SUCCESS",
+    "timestamp": "2026-06-18T14:22:00Z",
+    "fulfillment": "shipped"
   },
   {
-    "user_id": "U005",
-    "merchant": "Netflix",
-    "amount": 500,
-    "status": "SUCCESS"
+    "txn_id": "TXN301",
+    "user_id": "U003",
+    "merchant": "BestBuy",
+    "amount": 450.00,
+    "status": "SUCCESS",
+    "timestamp": "2026-06-22T11:00:00Z"
   },
   {
+    "txn_id": "TXN302",
+    "user_id": "U003",
+    "merchant": "BestBuy",
+    "amount": 450.00,
+    "status": "SUCCESS",
+    "timestamp": "2026-06-22T11:01:05Z"
+  },
+  {
+    "txn_id": "TXN303",
+    "user_id": "U003",
+    "merchant": "BestBuy",
+    "amount": 450.00,
+    "status": "SUCCESS",
+    "timestamp": "2026-06-22T11:01:40Z"
+  },
+  {
+    "txn_id": "TXN401",
+    "user_id": "U004",
+    "merchant": "Spotify",
+    "amount": 11.99,
+    "status": "SUCCESS",
+    "timestamp": "2026-06-01T00:00:00Z"
+  },
+  {
+    "txn_id": "TXN402",
+    "user_id": "U004",
+    "merchant": "Uber",
+    "amount": 24.50,
+    "status": "SUCCESS",
+    "timestamp": "2026-06-19T21:15:00Z",
+    "fulfillment": "completed"
+  },
+  {
+    "txn_id": "TXN501",
     "user_id": "U005",
     "merchant": "Netflix",
-    "amount": 700,
-    "status": "SUCCESS"
+    "amount": 9.99,
+    "status": "SUCCESS",
+    "timestamp": "2026-04-20T08:30:00Z"
+  },
+  {
+    "txn_id": "TXN502",
+    "user_id": "U005",
+    "merchant": "Netflix",
+    "amount": 15.49,
+    "status": "SUCCESS",
+    "timestamp": "2026-05-20T08:30:00Z"
   }
 ]

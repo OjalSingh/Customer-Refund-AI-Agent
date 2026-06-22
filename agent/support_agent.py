@@ -1,31 +1,43 @@
-
-
+from agent.state import AgentState
+from tools.user_tool import search_user
+from tools.transaction_tool import get_transactions
+from tools.policy_retriever import retrieve_policy
+from agent.intent_node import run_intent_node
+from agent.router import route_intent
 from tools.investigation_engine import run_investigation
-from policies.refund_policy import evaluate_refund
+from policies.refund_policy import evaluate_refund_with_policy
 from risk.risk_engine import assess_risk
 from guardrails.validation import validate_decision
-from agent.explanation_llm import generate_explanation
 from tools.document_retriever import retrieve_relevant_docs
 from tools.document_loader import load_document_contents
 from agent.explanation_generator import build_explanation
 from agent.explanation_llm import generate_explanation
 
 
-def run_agent(user_message, user_id):
+# Change the function signature to accept follow_up_answers
+def run_agent(user_message, user_id, follow_up_answers=None):
 
     state = AgentState(user_message)
-
     state.update("user_id", user_id)
     state.log("Agent started")
+    
+    # Store the follow-up answers inside state memory
+    answers_dict = follow_up_answers or {}
+    state.update("follow_up_answers", answers_dict)
+    
+    # Push answers into customer context memory layer for downstream evaluation
+    for q, a in answers_dict.items():
+        # Sanitize keys slightly so they are easy for the LLM to read
+        clean_key = q.replace("?", "").lower().replace(" ", "_")
+        state.update_customer_context(clean_key, a)
 
-    # Intent
+    # 1. Extract Intent & Routing
     state = run_intent_node(state)
-
-    workflow = route_intent(state.get()["intent"])
+    workflow = route_intent(state.value("intent"))
     state.update("workflow", workflow)
     state.log(f"Workflow selected: {workflow}")
 
-    # User
+    # 2. Fetch User Context
     user = search_user(user_id)
     state.update("user", user)
 
@@ -34,96 +46,80 @@ def run_agent(user_message, user_id):
         state.log("User not found")
         return state.get()
 
-    # Transactions
+    # 3. Fetch Transaction Context
     transactions = get_transactions(user_id)
     state.update("transactions", transactions)
 
+    # 4. Update Customer Memory Profile
+    state.update_customer_context("total_transactions", len(transactions))
+    state.update_customer_context("total_spend", sum(t["amount"] for t in transactions))
 
-    # MEMORY UPDATE
-    state.update_customer_context(
-        "total_transactions",
-        len(transactions)
-    )
-
-    state.update_customer_context(
-        "total_spend",
-        sum(t["amount"] for t in transactions)
-    )
-
-    # Common investigation (used by all workflows)
+    # 5. Execute Background Engine Profiles
     investigation = run_investigation(transactions, user)
     state.update("investigation_result", investigation)
 
-    # Policy (load once)
+    risk_result = assess_risk(user, transactions)
+    state.update("risk_result", risk_result)
+    state.log("Baseline financial risk assessed")
+
+    state.update_customer_context("risk_level", risk_result["risk_level"])
+    state.update_customer_context("risk_score", risk_result["risk_score"])
+
+    # 6. Retrieve Static Text Policy Rules
     policy = retrieve_policy()
     state.update("policy", policy)
 
-    # =========================
-    # WORKFLOW ROUTING
-    # =========================
-
+    # ==========================================================
+    # WORKFLOW RUNTIME LOGIC
+    # ==========================================================
     if workflow == "refund":
+        # The engine now dynamically evaluates BOTH transactions AND conversational answers
+        policy_result = evaluate_refund_with_policy(
+            policy, 
+            state.value("intent"), 
+            state.value("transactions"),
+            state.value("customer_context") # Now includes question answers!
+        )
+        state.update("policy_result", policy_result)
 
-        policy_result = evaluate_refund(transactions)
-
-        risk_result = assess_risk(user, transactions)
-
-        valid, msg = validate_decision(user, transactions, policy_result)
+        # Operational safety barrier verification
+        valid, msg = validate_decision(state.value("user"), state.value("transactions"), policy_result)
         state.log(msg)
 
-        #GUARDRAIL ENFORCEMENT
+        # Enforce isolated guardrail conditional execution blocks
         if not valid:
             state.update("decision", "REJECT")
             state.log("Guardrail blocked decision → forced REJECT")
-
-        if valid and policy_result["eligible"]:
+        elif policy_result.get("eligible"):
             state.update("decision", "ESCALATE")
-            state.log("Refund approved")
+            state.log("Refund approved for escalation")
         else:
             state.update("decision", "REJECT")
-            state.log("Refund rejected")
+            state.log("Refund rejected per policy rules")
 
     elif workflow == "fraud":
-
-        if investigation["duplicate"] or investigation["high_value"]:
+        if investigation.get("duplicate") or investigation.get("high_value"):
             state.update("decision", "ESCALATE")
-            state.log("Fraud detected → Escalate")
+            state.log("Fraud detected → Escalate to Risk Operations")
         else:
             state.update("decision", "REJECT")
-            state.log("No fraud signals found")
+            state.log("No explicit fraud signals matched")
 
     elif workflow == "subscription":
-
         state.update("decision", "REJECT")
-        state.log("Subscription workflow (stub)")
+        state.log("Subscription workflow evaluated (stub rejection implemented)")
 
     else:
         state.update("decision", "REJECT")
-        state.log("Unknown workflow")
+        state.log("Unknown workflow state matched")
 
-    # Risk always computed (optional but consistent)
-    state.update("risk_result", risk_result)
-    state.log("Risk assessed")
-
-    # MEMORY UPDATE (ADD HERE)
-    state.update_customer_context(
-        "risk_level",
-        risk_result["risk_level"]
-    )
-
-    state.update_customer_context(
-        "risk_score",
-        risk_result["risk_score"]
-    )
-
-    # Structured explanation (truth layer)
+    # 7. Post-Execution Pipeline Reports & Explanations Generation
     structured_explanation = build_explanation(state)
     state.update("structured_explanation", structured_explanation)
     state.log("Structured explanation generated")
 
-    # LLM explanation (human layer)
     llm_explanation = generate_explanation(state)
     state.update("explanation", llm_explanation)
-    state.log("LLM explanation generated")
+    state.log("LLM conversation layer response created")
 
     return state.get()
