@@ -71,13 +71,18 @@ def run_agent(user_message, user_id, follow_up_answers=None):
     # ==========================================================
     # WORKFLOW RUNTIME LOGIC
     # ==========================================================
-    if workflow == "refund":
-        # The engine now dynamically evaluates BOTH transactions AND conversational answers
+    if state.value("intent") in ["unknown", "greeting", "ambiguous"] or not workflow:
+        state.update("decision", "AWAITING_CLARIFICATION")
+        state.update("explanation", "Hello! I can help you with processing refunds, investigating unauthorized fraudulent charges, or managing your active subscriptions. Could you please provide more details or specify which transaction you are referring to?")
+        state.log("Agent requested clarification from user")
+        return state.get()
+    
+    if workflow in ["refund", "refund_request", "dispute"]:
         policy_result = evaluate_refund_with_policy(
             policy, 
             state.value("intent"), 
             state.value("transactions"),
-            state.value("customer_context") # Now includes question answers!
+            state.value("customer_context")
         )
         state.update("policy_result", policy_result)
 
@@ -104,9 +109,25 @@ def run_agent(user_message, user_id, follow_up_answers=None):
             state.update("decision", "REJECT")
             state.log("No explicit fraud signals matched")
 
+    # Subscription Evaluation Loop
     elif workflow == "subscription":
-        state.update("decision", "REJECT")
-        state.log("Subscription workflow evaluated (stub rejection implemented)")
+        state.log("Executing subscription policy evaluation...")
+        
+        # Look for subscription keywords or indicators in active transactions
+        has_active_subscription = any("netflix" in str(t.get("merchant", "")).lower() for t in transactions)
+        
+        # Check if they explicitly asked to cancel or stop it
+        msg_lower = user_message.lower()
+        if "cancel" in msg_lower or "stop" in msg_lower or "unsubscribe" in msg_lower:
+            state.update("decision", "ESCALATE")
+            state.log("Valid subscription cancellation intent → Escalate for processing")
+        elif has_active_subscription:
+            state.update("decision", "REJECT")
+            state.update("explanation", "I see an active billing agreement on your profile, but I'm not sure what you'd like me to do with it. Would you like to cancel your subscription or dispute a specific charge?")
+            state.log("Subscription found but action unclear")
+        else:
+            state.update("decision", "REJECT")
+            state.log("No matching subscription agreements found on record")
 
     else:
         state.update("decision", "REJECT")

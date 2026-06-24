@@ -1,5 +1,9 @@
 [VELOCITY-ATTACK-FLAG]
-Accounts exhibiting transactional actions targeting the exact same merchant gateway within an instantaneous time delta window of less than 60 seconds must be systematically routed away from basic operational flows. Near-simultaneous multi-billing raises a severe risk of automated transaction-testing scripts or API hijacking.
+- CONDITION 1 (Systemic Evaluation): Accounts exhibiting multiple transactional actions targeting the exact same merchant gateway within an instantaneous time delta window of less than 60 seconds must be systematically isolated. 
+- CONDITION 2 (Duplicate vs. Attack Distinction): 
+    * If the multi-billing consists of exactly two identical items (e.g., a dual-click billing glitch), do not issue a blanket fraud rejection. Mark as UNCERTAIN and route to ESCALATE for billing correction.
+    * If the ledger displays three or more rapid firing attempts, classify as an active API hijack or automated transaction-testing script. Execute an immediate hard REJECT and freeze the pipeline.
 
 [HIGH-VALUE-COMPLIANCE-LIMIT]
-Any dispute, financial refund request, or fraud report linked to an individual ledger item totaling a transaction sum equal to or exceeding $500.00 is classified as an Enterprise Risk. This action triggers an absolute override of the agent state machine, mandating a safe ESCALATE decision to human risk analysts.
+- CONDITION 1 (Absolute Value Threshold): Any dispute, financial refund request, or cancellation report linked to an individual ledger item totaling a transaction sum equal to or exceeding $500.00 is classified as an Enterprise Risk. 
+- CONDITION 2 (Anti-Premature Action Guardrail): This limit triggers an absolute override of the automated agent state machine. The system is strictly forbidden from issuing an autonomous REJECT or APPROVE choice based on other text sub-clauses. It mandates a safe, information-preserving transition to an ESCALATE state for manual human risk analyst intervention.

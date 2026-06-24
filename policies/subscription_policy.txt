@@ -1,2 +1,7 @@
 [SUBSCRIPTION-CANCELLATION-RULE]
-Users are authorized to terminate recurring billing agreements at any time via the automated interface, provided there are no outstanding past-due invoices attached to the subscription ID. If an invoice is collection-pending, the system must freeze the automatic pipeline.
+- CASE A (Standard): If a user requests a subscription termination or active processing order cancellation, and there are NO outstanding past-due invoices on the account, APPROVE the cancellation immediately.
+- CASE B (Uncertainty / Missing Context): If the user's intent is to cancel a physical order but the ledger only displays digital recurring merchant subscriptions (e.g., Netflix, Spotify), the system must NOT make a final decision. Instead, flag as UNCERTAIN and route to ESCALATE for human agent intervention to verify the target asset.
+- CASE C (Collections): If an invoice status is "past_due" or "collection_pending", freeze the pipeline and REJECT automated cancellation.
+
+[DUPLICATE-CHARGE-EXCEPTION]
+- If a user ledger shows multiple charges with identical amounts, identical timestamps, and matching merchant names, flag the event as an apparent duplicate billing error. Route to ESCALATE for a billing representative to process a targeted refund while keeping the core account active.

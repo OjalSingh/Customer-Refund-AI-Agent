@@ -33,5 +33,19 @@
     "status": "ACTIVE",
     "tier": "PREMIUM",
     "email": "benwood@example.com"
+  },
+  {
+    "user_id": "U006",
+    "name": "Marcus Vance",
+    "status": "FRAUD_LOCK",
+    "tier": "STANDARD",
+    "email": "mvance@example.com"
+  },
+  {
+    "user_id": "U007",
+    "name": "Elena Rostova",
+    "status": "SUSPENDED",
+    "tier": "PREMIUM",
+    "email": "elena.r@example.com"
   }
 ]

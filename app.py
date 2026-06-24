@@ -4,7 +4,7 @@ from agent.support_agent import run_agent
 # 1. Page Configuration & Aesthetic Layout
 st.set_page_config(page_title="FinOps Agent Framework", page_icon="🛡️", layout="wide")
 
-st.title("🛡️ Autonomous FinOps & Risk Agent Engine")
+st.title("🛡️ Autonomous Transaction Review Agent")
 st.markdown("A local, guardrailed state-machine agent executing semantic policy compliance via local vector embeddings (`all-minilm`).")
 st.markdown("---")
 
@@ -47,11 +47,12 @@ if user_input := st.chat_input("Enter transaction query (e.g., 'I got charged tw
 
     # Render Agent Response
     with st.chat_message("assistant"):
-        # Visual badge highlighting the isolated state machine decision output
         if decision == "ESCALATE":
             st.error(f"🚨 SYSTEM STATE: [ESCALATE TO RISK OPERATIONS]")
         elif decision == "REJECT":
             st.warning(f"⚠️ SYSTEM STATE: [REJECT TRANSACTION]")
+        elif decision == "AWAITING_CLARIFICATION":
+            st.info(f"🤔 SYSTEM STATE: [AWAITING CLARIFICATION]")
         else:
             st.success(f"✅ SYSTEM STATE: [{decision}]")
             
