@@ -49,6 +49,7 @@ def test_ollama_connection_error_is_unavailable(monkeypatch):
 
 
 def test_anthropic_provider_uses_haiku_and_prices_the_call(monkeypatch):
+    pytest.importorskip("anthropic")  # installed with the "hosted" extra, as CI does
     monkeypatch.setenv("LLM_PROVIDER", "anthropic")
     calls = []
 
