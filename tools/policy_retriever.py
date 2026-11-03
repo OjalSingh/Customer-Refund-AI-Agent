@@ -1,5 +1,6 @@
 from tools.document_retriever import retrieve_semantic_policy
 
+
 def retrieve_policy_semantically(user_message, workflow=None):
     """
     A clean architecture wrapper that routes policy-specific requests 

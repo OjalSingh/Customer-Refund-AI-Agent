@@ -1,9 +1,10 @@
 import json
 
+from agent.paths import DATA_DIR
+
 
 def search_user(user_id):
-
-    with open("data/users.json", "r") as f:
+    with open(DATA_DIR / "users.json", encoding="utf-8") as f:
         users = json.load(f)
 
     for user in users:

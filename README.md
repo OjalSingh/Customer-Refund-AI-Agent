@@ -2,7 +2,9 @@
 
 A high-fidelity, state-driven customer operations AI agent designed for complex fintech workflows (Refunds, Fraud Analysis, Order Cancellations). This project demonstrates a decoupled architecture that separates unstructured natural language processing from rigid, compliance-grade business logic.
 
-Built to run entirely locally using open-weight models via **Ollama (Qwen/Llama 3)**, but fully model-agnostic and built to scale to enterprise cloud infrastructures.
+Built to run entirely on-prem using open-weight models via **Ollama (Qwen/Llama 3)**: no customer data has to leave the bank. The model only reads the request; a deterministic policy engine makes every decision and cites the policy clause it applied.
+
+[![CI](https://github.com/OjalSingh/Customer-Refund-AI-Agent/actions/workflows/ci.yml/badge.svg)](https://github.com/OjalSingh/Customer-Refund-AI-Agent/actions/workflows/ci.yml)
 
 ---
 
@@ -24,6 +26,54 @@ Instead of forcing users through frustrating, legacy phone-tree IVR structures (
 * **Inference Engine:** Ollama (Targeting `qwen2.5:3b` / `llama3.1:8b`)
 * **State Framework:** Event-Driven Context Registry
 * **Data Storage:** Simulated local JSON schemas (`data/users.json`, `data/transactions.json`)
+
+---
+
+## ✅ Evaluation
+
+`evals/cases.jsonl` holds 79 scripted customer requests across refunds, duplicate billing, fraud, subscription and order cancellations, account locks, clarification and 17 prompt-injection attempts, plus benign messages that only look like injections. A case passes when the agent returns the expected decision **and** cites the expected policy clause.
+
+```bash
+python -m evals.run_evals                        # with your configured model (default: Ollama)
+LLM_PROVIDER=offline python -m evals.run_evals   # no model: keyword intent baseline, runs in CI
+```
+
+CI runs the offline baseline on every push and pull request and fails if the pass rate drops below 90% or if the agent approves anything it should not.
+
+### Eval results: provider `offline`, model `default`
+
+| Metric | Value |
+| --- | --- |
+| Cases | 79 |
+| Pass rate (decision and cited clause) | 93.7% |
+| Decision accuracy | 96.2% |
+| Intent accuracy | 95.2% |
+| Prompt-injection detection rate | 88.2% |
+| Injection false-positive rate | 0.0% |
+| Unsafe approvals | 0 |
+| Avg seconds per case | 0.001 |
+
+| Category | Cases | Pass rate |
+| --- | --- | --- |
+| account | 8 | 100.0% |
+| benign | 4 | 100.0% |
+| cancellation | 14 | 100.0% |
+| clarification | 5 | 100.0% |
+| duplicate | 6 | 66.7% |
+| fraud | 10 | 100.0% |
+| injection | 17 | 88.2% |
+| refund | 15 | 93.3% |
+
+Notes on reading these numbers:
+- The offline baseline replaces the LLM with keyword intent extraction, so it is a floor, not the model's score. Its keyword lists were written alongside these cases, so treat it as a regression check. Run the suite with your model for the real number.
+- **Unsafe approvals** counts cases where the agent approved something the policy does not allow. It stays at 0 even when an injection slips past the detector, because the model never decides: a missed injection can only change which clause is cited, not unlock an approval.
+
+## ⚖️ How a decision is made
+
+1. **Injection screen** (`guardrails/injection.py`): the raw message, and any follow-up answers, are checked before any model sees them. A match forces `REJECT` under `PROMPT-INJECTION-DEFENSE-GUARD` and the LLM is skipped.
+2. **Intent extraction** (`agent/intent_extractor.py`): the LLM returns `{intent, merchant}` as JSON, validated with Pydantic. Invalid output, or no model, falls back to keyword rules. Merchants are only accepted if they exist in the ledger.
+3. **Policy engine** (`agent/policy_engine.py`): plain Python applies the rules from `policies/*.txt` in priority order (account status, velocity attack, high value, duplicate charge, refund matrix, cancellation rules) and returns the decision, the clause id and the transactions it relied on.
+4. **Explanation** (`agent/explanation_llm.py`): the LLM explains the decision it was given. It cannot change it.
 
 ---
 
@@ -165,7 +215,6 @@ Bash
 │       
 ├───policies                    # Core Corporate Guideline Datastores
 │   ├──fraud_policy.txt        # Text requirements for velocity checks
-│   ├──refund_policy.py        # Programmatic execution mirrors for refunds
 │   ├──refund_policy.txt       # Hard criteria documentation for billing errors
 │   └──subscription_policy.txt # Scope rules for recurring account cancellations
 │       
@@ -207,8 +256,16 @@ pip install -r requirements.txt
 ## Configure Local Embeddings & Models via Ollama
 The semantic retrieval layers run locally to ensure 0% external cloud data leakage. Ensure Ollama is running on your machine, then pull the lightweight embedding model
 ### Bash
-ollama pull qwen3b:8
+ollama pull qwen3:8b
 ollama pull all-minilm
+
+## Running the tests
+
+```bash
+uv sync                        # or: pip install -r requirements.txt pytest ruff
+uv run ruff check .
+uv run pytest
+```
 
 ## Launching the Interactive Web UI Interface
 

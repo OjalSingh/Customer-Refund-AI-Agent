@@ -1,4 +1,5 @@
 import streamlit as st
+
 from agent.support_agent import run_agent
 
 # 1. Page Configuration & Aesthetic Layout
@@ -14,9 +15,8 @@ with st.sidebar:
     user_id = st.text_input("Simulated User ID", value="U001")
     st.markdown("---")
     st.subheader("📚 Loaded RAG Repositories")
-    st.caption("• policies/refund_policy.txt")
-    st.caption("• policies/fraud_policy.txt")
-    st.caption("• policies/subscription_policy.txt")
+    for policy_file in ("account_policy.txt", "fraud_policy.txt", "refund_policy.txt", "security_policy.txt", "subscription_policy.txt"):
+        st.caption(f"• policies/{policy_file}")
 
 # Initialize Chat Memory State
 if "messages" not in st.session_state:
@@ -48,18 +48,20 @@ if user_input := st.chat_input("Enter transaction query (e.g., 'I got charged tw
     # Render Agent Response
     with st.chat_message("assistant"):
         if decision == "ESCALATE":
-            st.error(f"🚨 SYSTEM STATE: [ESCALATE TO RISK OPERATIONS]")
+            st.error("🚨 SYSTEM STATE: [ESCALATE TO RISK OPERATIONS]")
         elif decision == "REJECT":
-            st.warning(f"⚠️ SYSTEM STATE: [REJECT TRANSACTION]")
+            st.warning("⚠️ SYSTEM STATE: [REJECT TRANSACTION]")
         elif decision == "AWAITING_CLARIFICATION":
-            st.info(f"🤔 SYSTEM STATE: [AWAITING CLARIFICATION]")
+            st.info("🤔 SYSTEM STATE: [AWAITING CLARIFICATION]")
         else:
             st.success(f"✅ SYSTEM STATE: [{decision}]")
             
         st.markdown(llm_response)
         
         # Collapsible section proving your RAG system worked beautifully
-        with st.expander("🔍 System Audit Trail (Semantic RAG Chunks Used)"):
+        st.caption(f"Policy clause applied: {agent_final_state.get('policy_clause') or 'none'}")
+        with st.expander("🔍 Policy clause and audit trail"):
             st.code(retrieved_policy, language="text")
+            st.code("\n".join(agent_final_state.get("audit_log", [])), language="text")
 
     st.session_state.messages.append({"role": "assistant", "content": llm_response})
