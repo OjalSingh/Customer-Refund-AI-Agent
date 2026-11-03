@@ -6,6 +6,7 @@ from agent.router import route_intent
 from agent.state import AgentState
 from guardrails.injection import detect_prompt_injection
 from guardrails.validation import validate_decision
+from llm import model_name, provider_name, start_usage_tracking, usage_summary
 from risk.risk_engine import assess_risk
 from tools.investigation_engine import run_investigation
 from tools.policy_clauses import clause_text
@@ -20,8 +21,10 @@ def run_agent(user_message, user_id, follow_up_answers=None, explain=True):
     explain=False skips the LLM explanation step (the eval suite uses this to
     score decisions quickly).
     """
+    start_usage_tracking()
     state = AgentState(user_message)
     state.update("user_id", user_id)
+    state.update("llm", {"provider": provider_name(), "model": model_name()})
     state.log("Agent started")
 
     answers = follow_up_answers or {}
@@ -84,6 +87,7 @@ def run_agent(user_message, user_id, follow_up_answers=None, explain=True):
             "I can help with refunds, unauthorized or duplicate charges, and cancelling subscriptions or orders. "
             "Could you tell me what happened and which merchant the charge was from?",
         )
+        state.update("llm_usage", usage_summary())
         return state.get()
 
     # 5. Supporting context and explanation (never changes the decision).
@@ -95,4 +99,5 @@ def run_agent(user_message, user_id, follow_up_answers=None, explain=True):
         state.update("explanation", generate_explanation(state))
         state.log("Explanation generated")
 
+    state.update("llm_usage", usage_summary())
     return state.get()
