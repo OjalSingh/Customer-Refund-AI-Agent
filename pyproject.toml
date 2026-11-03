@@ -10,6 +10,9 @@ dependencies = [
     "streamlit>=1.40",
 ]
 
+[project.optional-dependencies]
+hosted = ["anthropic>=2.0"]
+
 [dependency-groups]
 dev = [
     "pytest>=8.0",

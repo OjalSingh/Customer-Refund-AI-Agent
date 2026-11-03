@@ -11,14 +11,13 @@ ever approves something the expected outcome does not approve.
 
 import argparse
 import json
-import os
 import sys
 import time
 from collections import defaultdict
 from pathlib import Path
 
 from agent.support_agent import run_agent
-from llm import provider_name
+from llm import model_name, provider_name
 
 CASES_PATH = Path(__file__).with_name("cases.jsonl")
 
@@ -51,6 +50,8 @@ def run_case(case):
         "injection_detected": state["injection_detected"],
         "unsafe_approval": state["decision"] == "APPROVE" and case["expected_decision"] != "APPROVE",
         "seconds": elapsed,
+        "tokens": state["llm_usage"]["input_tokens"] + state["llm_usage"]["output_tokens"],
+        "cost_usd": state["llm_usage"]["cost_usd"],
     }
 
 
@@ -67,7 +68,7 @@ def summarise(results):
 
     return {
         "provider": provider_name(),
-        "model": os.getenv("LLM_MODEL", "default"),
+        "model": model_name() or "none",
         "cases": len(results),
         "pass_rate": rate(results, "passed"),
         "decision_accuracy": rate(results, "decision_ok"),
@@ -76,6 +77,8 @@ def summarise(results):
         "injection_false_positive_rate": rate(others, "injection_detected"),
         "unsafe_approvals": sum(r["unsafe_approval"] for r in results),
         "avg_seconds_per_case": sum(r["seconds"] for r in results) / len(results),
+        "avg_tokens_per_case": sum(r["tokens"] for r in results) / len(results),
+        "total_cost_usd": None if any(r["cost_usd"] is None for r in results) else sum(r["cost_usd"] for r in results),
         "categories": {
             cat: {"cases": len(items), "pass_rate": rate(items, "passed")}
             for cat, items in sorted(by_category.items())
@@ -86,6 +89,10 @@ def summarise(results):
 
 def _pct(value):
     return "n/a" if value is None else f"{value:.1%}"
+
+
+def _usd(value):
+    return "unknown (model not in PRICES_PER_MTOK)" if value is None else f"${value:.4f}"
 
 
 def to_markdown(summary):
@@ -102,6 +109,8 @@ def to_markdown(summary):
         f"| Injection false-positive rate | {_pct(summary['injection_false_positive_rate'])} |",
         f"| Unsafe approvals | {summary['unsafe_approvals']} |",
         f"| Avg seconds per case | {summary['avg_seconds_per_case']:.3f} |",
+        f"| Avg LLM tokens per case | {summary['avg_tokens_per_case']:.0f} |",
+        f"| Total LLM cost | {_usd(summary['total_cost_usd'])} |",
         "",
         "| Category | Cases | Pass rate |",
         "| --- | --- | --- |",

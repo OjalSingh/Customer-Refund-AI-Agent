@@ -23,7 +23,7 @@ Instead of forcing users through frustrating, legacy phone-tree IVR structures (
 
 ## 🛠️ Tech Stack & Dependencies
 * **Core Language:** Python 3.10+
-* **Inference Engine:** Ollama (Targeting `qwen2.5:3b` / `llama3.1:8b`)
+* **Inference Engine:** Ollama (`qwen3:8b`) by default; Claude Haiku or any OpenAI-compatible API optional
 * **State Framework:** Event-Driven Context Registry
 * **Data Storage:** Simulated local JSON schemas (`data/users.json`, `data/transactions.json`)
 
@@ -67,6 +67,24 @@ CI runs the offline baseline on every push and pull request and fails if the pas
 Notes on reading these numbers:
 - The offline baseline replaces the LLM with keyword intent extraction, so it is a floor, not the model's score. Its keyword lists were written alongside these cases, so treat it as a regression check. Run the suite with your model for the real number.
 - **Unsafe approvals** counts cases where the agent approved something the policy does not allow. It stays at 0 even when an injection slips past the detector, because the model never decides: a missed injection can only change which clause is cited, not unlock an approval.
+
+## 🔌 Model providers
+
+The agent runs fully on-prem by default. A hosted model is an option for a public demo, not a requirement. Pick one with environment variables (see `.env.example`):
+
+| `LLM_PROVIDER` | Model | Data leaves the machine? | Notes |
+| --- | --- | --- | --- |
+| `ollama` (default) | `qwen3:8b` | No | Needs a running Ollama |
+| `anthropic` | `claude-haiku-5-5` | Yes | `pip install ".[hosted]"`, set `ANTHROPIC_API_KEY` |
+| `openai` | set `LLM_MODEL` | Yes | Any OpenAI-compatible endpoint: Gemini (default `OPENAI_BASE_URL`), Groq, vLLM, LM Studio |
+| `offline` | none | No | Keyword intent and template explanations; used by CI |
+
+Whichever provider you choose, the decision comes from the same policy engine. Every run returns `state["llm_usage"]` with the tokens and estimated cost of each model call, and the eval report shows average tokens and total cost per run, so you can compare providers on the same 79 cases:
+
+```bash
+LLM_PROVIDER=anthropic python -m evals.run_evals --markdown evals/results/haiku.md
+LLM_PROVIDER=ollama    python -m evals.run_evals --markdown evals/results/qwen.md
+```
 
 ## ⚖️ How a decision is made
 
