@@ -285,7 +285,21 @@ uv run ruff check .
 uv run pytest
 ```
 
-## Launching the Interactive Web UI Interface
+## Running the API and web UI
+
+```bash
+uvicorn api.main:app --reload          # open http://localhost:8000, API docs at /docs
+```
+
+`POST /api/review` takes `{"user_id": "U001", "message": "I got charged twice by Netflix"}` and returns the decision, the clause, the transactions it relied on, the explanation, the audit trail and token usage. The page at `/` lets you pick a demo customer, see their ledger, and highlights the transactions behind each decision.
+
+To deploy (Cloud Run, Fly.io or anything that runs a container), build the Dockerfile and set `LLM_PROVIDER=anthropic` plus `ANTHROPIC_API_KEY`, or `LLM_PROVIDER=offline` for a model-free demo:
+
+```bash
+docker build -t refund-agent . && docker run -p 8080:8080 -e LLM_PROVIDER=offline refund-agent
+```
+
+## Launching the Streamlit Interface
 
 ### Bash
 python -m streamlit run app.py
