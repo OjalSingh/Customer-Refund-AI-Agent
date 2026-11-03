@@ -10,7 +10,7 @@ def load_document_contents(doc_names):
         path = os.path.join("policies", doc)
 
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 documents[doc] = f.read()
 
         except Exception as e:

@@ -22,6 +22,10 @@ class AgentState:
                 "policy": None,
 
                 "policy_result": None,
+                "policy_decision": None,
+                "policy_clause": None,
+                "injection_detected": False,
+                "retrieved_policy": None,
                 "risk_result": None,
 
                 "decision": None,

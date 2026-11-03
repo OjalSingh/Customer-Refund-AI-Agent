@@ -1,5 +1,5 @@
 [VELOCITY-ATTACK-FLAG]
-- CONDITION 1 (Systemic Evaluation): Accounts exhibiting multiple transactional actions targeting the exact same merchant gateway within an instantaneous time delta window of less than 60 seconds must be systematically isolated. 
+- CONDITION 1 (Systemic Evaluation): Accounts exhibiting multiple transactional actions targeting the exact same merchant gateway within a rapid time window of 120 seconds or less must be systematically isolated. 
 - CONDITION 2 (Duplicate vs. Attack Distinction): 
     * If the multi-billing consists of exactly two identical items (e.g., a dual-click billing glitch), do not issue a blanket fraud rejection. Mark as UNCERTAIN and route to ESCALATE for billing correction.
     * If the ledger displays three or more rapid firing attempts, classify as an active API hijack or automated transaction-testing script. Execute an immediate hard REJECT and freeze the pipeline.
@@ -7,3 +7,6 @@
 [HIGH-VALUE-COMPLIANCE-LIMIT]
 - CONDITION 1 (Absolute Value Threshold): Any dispute, financial refund request, or cancellation report linked to an individual ledger item totaling a transaction sum equal to or exceeding $500.00 is classified as an Enterprise Risk. 
 - CONDITION 2 (Anti-Premature Action Guardrail): This limit triggers an absolute override of the automated agent state machine. The system is strictly forbidden from issuing an autonomous REJECT or APPROVE choice based on other text sub-clauses. It mandates a safe, information-preserving transition to an ESCALATE state for manual human risk analyst intervention.
+
+[UNAUTHORIZED-CHARGE-REPORT]
+- CONDITION 1 (No Automated Dismissal): If a customer reports a charge as unauthorized, unrecognized or fraudulent and no velocity pattern above applies, the agent must not dismiss the report automatically. Route to ESCALATE for a Risk Operations analyst to investigate.

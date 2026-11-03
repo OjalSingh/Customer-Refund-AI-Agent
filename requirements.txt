@@ -1,5 +1,4 @@
-# Core Web Interface Framework
-streamlit==1.58.0
-
-# Network Communication Layer for Local API Calls
-requests==2.34.2
+# Runtime dependencies (pyproject.toml is the source of truth; this file is kept for pip users)
+pydantic>=2.7
+requests>=2.32
+streamlit>=1.40

@@ -1,0 +1,7 @@
+[ACCOUNT-STATUS-GATE]
+- CONDITION 1 (Unknown Account): If the supplied User ID does not match a customer record, REJECT. No ledger data may be disclosed or modified.
+- CONDITION 2 (Locked Accounts): Accounts with status "FRAUD_LOCK" or "SUSPENDED" are frozen. REJECT every automated refund, dispute or cancellation request.
+- CONDITION 3 (Accounts Under Review): Accounts with status "UNDER_REVIEW" may not receive autonomous decisions. Route to ESCALATE, unless a hard REJECT rule (such as a velocity attack) applies first.
+
+[LEDGER-MATCH-REQUIREMENT]
+- CONDITION 1 (No Matching Charge): If the customer names a merchant that does not appear anywhere in their ledger, REJECT the request and ask them to check the account the charge was made on.
